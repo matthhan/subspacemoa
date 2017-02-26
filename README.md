@@ -10,3 +10,6 @@ Otherwise, you can run `gradle <task>` to run any of a list of tasks. The most i
 
 To run the minify task, one should also have proguard installed and the Java Home folder should be located at `/usr/lib/jvm/default-java`.
 
+##R interface
+
+The source code for the R interface to this package can be found [here](https://github.com/matthhan/rsubspacemoa)
