@@ -1,0 +1,14 @@
+*.class
+*.jar
+#build results
+build
+#gradle temp files
+.gradle
+#Vim undo files
+*.un~
+#generated windows files for gradle
+gradlew
+gradlew.bat
+#ide junk
+.idea
+gradle-wrapper.properties

@@ -1,0 +1,846 @@
+/**
+ * [SubspaceClusteringVisualTab.java] for Subspace MOA
+ * 
+ * "Visualization" subtab.
+ * 
+ * @author Yunsu Kim
+ * 		   based on the implementation of Timm Jansen
+ * Data Management and Data Exploration Group, RWTH Aachen University
+ */
+
+package moa.gui.subspaceclusteringtab;
+
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.ToolTipManager;
+
+import moa.gui.FileExtensionFilter;
+import moa.gui.subspacevisualization.SubspaceGraphCanvas;
+import moa.gui.subspacevisualization.SubspaceObjectRankingPanel;
+import moa.gui.subspacevisualization.SubspaceRunVisualizer;
+import moa.gui.subspacevisualization.SubspaceStreamPanel;
+
+public class SubspaceClusteringVisualTab extends javax.swing.JPanel implements ActionListener {
+	
+	private static final long serialVersionUID = 1L;
+	
+	private SubspaceRunVisualizer visualizer = null;
+    private Thread visualizerThread = null;
+    private Boolean running = false;
+    private SubspaceClusteringSetupTab subspaceClusteringSetupTab = null;
+    private String exportFile;
+    private String screenshotFilebase;
+
+    /** Creates new form ClusteringVisualTab */
+    public SubspaceClusteringVisualTab() {
+        resetComponents();
+    }
+
+    private void resetComponents(){
+        initComponents();
+        comboY.setSelectedIndex(1);
+        subspaceGraphCanvas.setViewport(graphScrollPanel.getViewport());
+
+        //TODO this needs to only affect the visual Panel
+        ToolTipManager.sharedInstance().setDismissDelay(20000);
+        ToolTipManager.sharedInstance().setInitialDelay(100);
+    }
+
+    public void setClusteringSetupTab(SubspaceClusteringSetupTab clusteringSetupTab){
+        this.subspaceClusteringSetupTab = clusteringSetupTab;
+    }
+
+
+    private void createVisualiterThread(){
+        visualizer = new SubspaceRunVisualizer(this, subspaceClusteringSetupTab);
+        visualizerThread = new Thread(visualizer);
+    }
+
+    public void setDimensionComboBoxes(int numDimensions){
+        String[] dimensions = new String[numDimensions];
+        for (int i = 0; i < dimensions.length; i++) {
+            dimensions[i] = "Dim "+(i+1);
+
+        }
+        comboX.setModel(new javax.swing.DefaultComboBoxModel(dimensions));
+        comboY.setModel(new javax.swing.DefaultComboBoxModel(dimensions));
+        comboY.setSelectedIndex(1);
+    }
+
+    public SubspaceStreamPanel getLeftStreamPanel(){
+        return streamPanel1;
+    }
+
+    public SubspaceStreamPanel getRightStreamPanel(){
+        return streamPanel2;
+    }
+
+    public SubspaceGraphCanvas getGraphCanvas(){
+        return subspaceGraphCanvas;
+    }
+
+    public SubspaceClusteringVisualEvalPanel getEvalPanel(){
+        return subspaceClusteringVisualEvalPanel1;
+    }
+
+    public boolean isEnabledDrawPoints(){
+        return checkboxDrawPoints.isSelected();
+    }
+
+    public boolean isEnabledDrawGroundTruth(){
+        return checkboxDrawGT.isSelected();
+    }
+
+    public boolean isEnabledDrawMicroclustering(){
+        return checkboxDrawMicro.isSelected();
+    }
+    public boolean isEnabledDrawClustering(){
+        return checkboxDrawClustering.isSelected();
+    }
+
+    public void setProcessedPointsCounter(int value){
+        label_processed_points_value.setText(Integer.toString(value));
+    }
+
+    public int getPauseInterval(){
+        return Integer.parseInt(numPauseAfterPoints.getText());
+    }
+
+    public void setPauseInterval(int pause){
+        numPauseAfterPoints.setText(Integer.toString(pause));
+    }
+
+    @Override
+    public void repaint() {
+        if(splitVisual!=null)
+            splitVisual.setDividerLocation(splitVisual.getWidth()/2);
+        super.repaint();
+    }
+
+    public void toggleVisualizer(boolean internal) {
+        if (visualizer == null)
+            createVisualiterThread();
+
+        if (!visualizerThread.isAlive()) {
+            visualizerThread.start();
+        }
+        
+        // "Pause"
+        if (running) {
+            running = false;
+            visualizer.pause();
+            buttonRun.setText("Resume");
+        } else {
+            running = true;
+            visualizer.resume();
+            buttonRun.setText("Pause");
+        }
+        
+        if (internal)
+            subspaceClusteringSetupTab.toggleRunMode();
+    }
+
+    public void stopVisualizer() {
+        visualizer.stop();
+        running = false;
+        visualizer = null;
+        visualizerThread = null;
+        removeAll();
+        resetComponents();
+        
+        subspaceClusteringSetupTab.stop(false);
+    }
+
+
+    /** This method is called from within the constructor to
+     * initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is
+     * always regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+        java.awt.GridBagConstraints gridBagConstraints;
+
+        jSplitPane1 = new javax.swing.JSplitPane();
+        topWrapper = new javax.swing.JPanel();
+        panelVisualWrapper = new javax.swing.JPanel();
+        splitVisual = new javax.swing.JSplitPane();
+        scrollPane2 = new javax.swing.JScrollPane();
+        streamPanel2 = new moa.gui.subspacevisualization.SubspaceStreamPanel();
+        scrollPane1 = new javax.swing.JScrollPane();
+        streamPanel1 = new moa.gui.subspacevisualization.SubspaceStreamPanel();
+        panelControl = new javax.swing.JPanel();
+        buttonRun = new javax.swing.JButton();
+        buttonStop = new javax.swing.JButton();
+        buttonScreenshot = new javax.swing.JButton();
+        speedSlider = new javax.swing.JSlider();
+        comboX = new javax.swing.JComboBox();
+        labelX = new javax.swing.JLabel();
+        comboY = new javax.swing.JComboBox();
+        labelY = new javax.swing.JLabel();
+        checkboxDrawPoints = new javax.swing.JCheckBox();
+        checkboxDrawGT = new javax.swing.JCheckBox();
+        checkboxDrawMicro = new javax.swing.JCheckBox();
+        checkboxDrawClustering = new javax.swing.JCheckBox();
+        label_processed_points = new javax.swing.JLabel();
+        label_processed_points_value = new javax.swing.JLabel();
+        labelNumPause = new javax.swing.JLabel();
+        numPauseAfterPoints = new javax.swing.JTextField();
+        panelEvalOutput = new javax.swing.JPanel();
+        subspaceClusteringVisualEvalPanel1 = new moa.gui.subspaceclusteringtab.SubspaceClusteringVisualEvalPanel();
+        graphPanel = new javax.swing.JPanel();
+        graphPanelControlTop = new javax.swing.JPanel();
+        buttonZoomInY = new javax.swing.JButton();
+        buttonZoomOutY = new javax.swing.JButton();
+        labelEvents = new javax.swing.JLabel();
+        graphScrollPanel = new javax.swing.JScrollPane();
+        subspaceGraphCanvas = new moa.gui.subspacevisualization.SubspaceGraphCanvas();
+        graphPanelControlBottom = new javax.swing.JPanel();
+        buttonZoomInX = new javax.swing.JButton();
+        buttonZoomOutX = new javax.swing.JButton();
+        
+        /* New ones */
+        leftPanelWithObjectRanking = new javax.swing.JPanel();
+        rightPanelWithObjectRanking = new javax.swing.JPanel();
+        buttonObjectRanking1 = new javax.swing.JButton();
+        buttonObjectRanking2 = new javax.swing.JButton();
+        
+        /* Defined size variables */
+        int streamPanelLength = 317;
+        int streamEvalVerticalDivider = 420;
+        
+        /** -- Layout setting starts -- **/
+
+        setLayout(new java.awt.GridBagLayout());
+
+        jSplitPane1.setDividerLocation(streamEvalVerticalDivider);
+        jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+
+        /** topWrapper = panelVisualWrapper + panelControl **/
+        topWrapper.setMinimumSize(new java.awt.Dimension(800, 650));
+        topWrapper.setPreferredSize(new java.awt.Dimension(800, 650));
+        topWrapper.setLayout(new java.awt.GridBagLayout());
+
+        // Wrapping the split of 2 stream panels
+        panelVisualWrapper.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        panelVisualWrapper.setLayout(new java.awt.BorderLayout());
+
+        // 2 stream panels
+        splitVisual.setDividerLocation(390);
+        splitVisual.setResizeWeight(1.0);
+
+        // Stream panel 0 (+ Object Ranking)
+        streamPanel1.setPreferredSize(new java.awt.Dimension(streamPanelLength, streamPanelLength));
+
+        javax.swing.GroupLayout streamPanel1Layout = new javax.swing.GroupLayout(streamPanel1);
+        streamPanel1.setLayout(streamPanel1Layout);
+        streamPanel1Layout.setHorizontalGroup(
+            streamPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 400, Short.MAX_VALUE)
+        );
+        streamPanel1Layout.setVerticalGroup(
+            streamPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 339, Short.MAX_VALUE)
+        );
+
+        scrollPane1.setViewportView(streamPanel1);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        leftPanelWithObjectRanking.add(scrollPane1, gridBagConstraints);
+        
+        buttonObjectRanking1.setText("Object Ranking");
+        buttonObjectRanking1.setPreferredSize(new java.awt.Dimension(150, 23));
+        buttonObjectRanking1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonObjectRanking0ActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        leftPanelWithObjectRanking.add(buttonObjectRanking1, gridBagConstraints);
+
+        // Stream panel 1 (+ Object Ranking)
+        streamPanel2.setPreferredSize(new java.awt.Dimension(streamPanelLength, streamPanelLength));
+
+        javax.swing.GroupLayout streamPanel2Layout = new javax.swing.GroupLayout(streamPanel2);
+        streamPanel2.setLayout(streamPanel2Layout);
+        streamPanel2Layout.setHorizontalGroup(
+            streamPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 400, Short.MAX_VALUE)
+        );
+        streamPanel2Layout.setVerticalGroup(
+            streamPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 339, Short.MAX_VALUE)
+        );
+
+        scrollPane2.setViewportView(streamPanel2);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        rightPanelWithObjectRanking.add(scrollPane2, gridBagConstraints);
+        
+        buttonObjectRanking2.setText("Object Ranking");
+        buttonObjectRanking2.setPreferredSize(new java.awt.Dimension(150, 23));
+        buttonObjectRanking2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonObjectRanking1ActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        rightPanelWithObjectRanking.add(buttonObjectRanking2, gridBagConstraints);
+
+        // Get together!
+        splitVisual.setLeftComponent(leftPanelWithObjectRanking);
+        splitVisual.setRightComponent(rightPanelWithObjectRanking);
+
+        panelVisualWrapper.add(splitVisual, java.awt.BorderLayout.CENTER);
+        
+        
+        /*scrollPane0.addMouseWheelListener(new java.awt.event.MouseWheelListener() {
+            public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) {
+                scrollPane0MouseWheelMoved(evt);
+            }
+        });*/
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridheight = java.awt.GridBagConstraints.RELATIVE;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.ipadx = 400;
+        gridBagConstraints.ipady = 200;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        topWrapper.add(panelVisualWrapper, gridBagConstraints);
+
+        
+        /* panelControl = Buttons + Dimension Comboboxes + Checkboxes + etc. */
+        panelControl.setMinimumSize(new java.awt.Dimension(600, 54));
+        panelControl.setPreferredSize(new java.awt.Dimension(600, 54));
+        panelControl.setLayout(new java.awt.GridBagLayout());
+
+        buttonRun.setText("Start");
+        buttonRun.setPreferredSize(new java.awt.Dimension(80, 23));
+        buttonRun.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                buttonRunMouseClicked(evt);
+            }
+        });
+        buttonRun.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonRunActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(1, 5, 0, 5);
+        panelControl.add(buttonRun, gridBagConstraints);
+
+        buttonStop.setText("Stop");
+        buttonStop.setPreferredSize(new java.awt.Dimension(80, 23));
+        buttonStop.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonStopActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 5);
+        panelControl.add(buttonStop, gridBagConstraints);
+
+        buttonScreenshot.setText("Screenshot");
+        buttonScreenshot.setPreferredSize(new java.awt.Dimension(110, 23));
+        buttonScreenshot.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                buttonScreenshotMouseClicked(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 5, 0, 5);
+        panelControl.add(buttonScreenshot, gridBagConstraints);
+
+        /*speedSlider.setValue(100);
+        speedSlider.setBorder(javax.swing.BorderFactory.createTitledBorder("Visualisation Speed"));
+        speedSlider.setPreferredSize(new java.awt.Dimension(120, 48));
+        speedSlider.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            public void mouseDragged(java.awt.event.MouseEvent evt) {
+                speedSliderMouseDragged(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 6;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.insets = new java.awt.Insets(0, 16, 1, 5);
+        panelControl.add(speedSlider, gridBagConstraints);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 9;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridheight = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        panelControl.add(jLabel1, gridBagConstraints);*/
+
+        comboX.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Dim 1", "Dim 2", "Dim 3", "Dim 4" }));
+        comboX.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboXActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
+        panelControl.add(comboX, gridBagConstraints);
+
+        labelX.setText("X");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 14, 0, 5);
+        panelControl.add(labelX, gridBagConstraints);
+
+        comboY.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Dim 1", "Dim 2", "Dim 3", "Dim 4" }));
+        comboY.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                comboYActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 3;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
+        panelControl.add(comboY, gridBagConstraints);
+
+        labelY.setText("Y");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 2;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.insets = new java.awt.Insets(0, 14, 0, 5);
+        panelControl.add(labelY, gridBagConstraints);
+
+        checkboxDrawPoints.setSelected(true);
+        checkboxDrawPoints.setText("Points");
+        checkboxDrawPoints.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        checkboxDrawPoints.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkboxDrawPointsActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 20, 0, 4);
+        panelControl.add(checkboxDrawPoints, gridBagConstraints);
+
+        checkboxDrawGT.setSelected(true);
+        checkboxDrawGT.setText("Ground truth");
+        checkboxDrawGT.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        checkboxDrawGT.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkboxDrawGTActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.SOUTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
+        panelControl.add(checkboxDrawGT, gridBagConstraints);
+
+        
+        /*checkboxDrawMicro.setSelected(true);
+        checkboxDrawMicro.setText("Microclustering");
+        checkboxDrawMicro.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        checkboxDrawMicro.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkboxDrawMicroActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 4;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 20, 0, 4);
+        panelControl.add(checkboxDrawMicro, gridBagConstraints);*/
+
+        checkboxDrawClustering.setSelected(true);
+        checkboxDrawClustering.setText("Clustering");
+        checkboxDrawClustering.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        checkboxDrawClustering.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkboxDrawClusteringActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 5;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 4, 0, 4);
+        panelControl.add(checkboxDrawClustering, gridBagConstraints);
+
+        label_processed_points.setText("Processed:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 7;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 0);
+        panelControl.add(label_processed_points, gridBagConstraints);
+
+        label_processed_points_value.setText("0");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 8;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
+        panelControl.add(label_processed_points_value, gridBagConstraints);
+
+        labelNumPause.setText("Pause in:");
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 7;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.insets = new java.awt.Insets(0, 6, 0, 0);
+        panelControl.add(labelNumPause, gridBagConstraints);
+
+        numPauseAfterPoints.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        numPauseAfterPoints.setText(Integer.toString(SubspaceRunVisualizer.initialPauseInterval));
+        numPauseAfterPoints.setPreferredSize(new java.awt.Dimension(80, 20));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 8;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        panelControl.add(numPauseAfterPoints, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
+        gridBagConstraints.weightx = 1.0;
+        topWrapper.add(panelControl, gridBagConstraints);
+        
+
+        jSplitPane1.setLeftComponent(topWrapper);
+
+        
+        /** panelEvalOutput = visualEvalPanel + graphPanel **/
+        panelEvalOutput.setPreferredSize(new Dimension(800,200));
+        panelEvalOutput.setBorder(javax.swing.BorderFactory.createTitledBorder("Evaluation"));
+        panelEvalOutput.setLayout(new java.awt.GridBagLayout());
+
+        subspaceClusteringVisualEvalPanel1.setMinimumSize(new java.awt.Dimension(290, 110));
+        subspaceClusteringVisualEvalPanel1.setPreferredSize(new java.awt.Dimension(290, 110));
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weighty = 1.0;
+        panelEvalOutput.add(subspaceClusteringVisualEvalPanel1, gridBagConstraints);
+
+        graphPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Plot"));
+        graphPanel.setPreferredSize(new java.awt.Dimension(530, 110));
+        graphPanel.setLayout(new java.awt.GridBagLayout());
+
+        graphPanelControlTop.setLayout(new java.awt.GridBagLayout());
+
+        buttonZoomInY.setText("Zoom in Y");
+        buttonZoomInY.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonZoomInYActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 2);
+        graphPanelControlTop.add(buttonZoomInY, gridBagConstraints);
+
+        buttonZoomOutY.setText("Zoom out Y");
+        buttonZoomOutY.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonZoomOutYActionPerformed(evt);
+            }
+        });
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 2);
+        graphPanelControlTop.add(buttonZoomOutY, gridBagConstraints);
+
+        labelEvents.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(0, 2, 0, 2);
+        graphPanelControlTop.add(labelEvents, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 1.0;
+        graphPanel.add(graphPanelControlTop, gridBagConstraints);
+
+        subspaceGraphCanvas.setPreferredSize(new java.awt.Dimension(500, 111));
+
+        javax.swing.GroupLayout graphCanvasLayout = new javax.swing.GroupLayout(subspaceGraphCanvas);
+        subspaceGraphCanvas.setLayout(graphCanvasLayout);
+        graphCanvasLayout.setHorizontalGroup(
+            graphCanvasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 515, Short.MAX_VALUE)
+        );
+        graphCanvasLayout.setVerticalGroup(
+            graphCanvasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 128, Short.MAX_VALUE)
+        );
+
+        graphScrollPanel.setViewportView(subspaceGraphCanvas);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 1;
+        gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        gridBagConstraints.insets = new java.awt.Insets(2, 2, 2, 2);
+        graphPanel.add(graphScrollPanel, gridBagConstraints);
+
+        buttonZoomInX.setText("Zoom in X");
+        buttonZoomInX.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonZoomInXActionPerformed(evt);
+            }
+        });
+        graphPanelControlBottom.add(buttonZoomInX);
+
+        buttonZoomOutX.setText("Zoom out X");
+        buttonZoomOutX.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                buttonZoomOutXActionPerformed(evt);
+            }
+        });
+        graphPanelControlBottom.add(buttonZoomOutX);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.EAST;
+        graphPanel.add(graphPanelControlBottom, gridBagConstraints);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.anchor = java.awt.GridBagConstraints.WEST;
+        gridBagConstraints.weightx = 2.0;
+        gridBagConstraints.weighty = 1.0;
+        panelEvalOutput.add(graphPanel, gridBagConstraints);
+
+        jSplitPane1.setRightComponent(panelEvalOutput);
+
+        gridBagConstraints = new java.awt.GridBagConstraints();
+        gridBagConstraints.fill = java.awt.GridBagConstraints.BOTH;
+        gridBagConstraints.weightx = 1.0;
+        gridBagConstraints.weighty = 1.0;
+        add(jSplitPane1, gridBagConstraints);
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void buttonScreenshotMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buttonScreenshotMouseClicked
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setAcceptAllFileFilterUsed(true);
+        if(screenshotFilebase!=null)
+            fileChooser.setSelectedFile(new File(screenshotFilebase));
+        if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+        	screenshotFilebase = fileChooser.getSelectedFile().getPath();
+        	streamPanel1.screenshot(screenshotFilebase+"_"+label_processed_points_value.getText()+"_0", true, true);
+            streamPanel2.screenshot(screenshotFilebase+"_"+label_processed_points_value.getText()+"_1", true, true);
+        }
+
+    }//GEN-LAST:event_buttonScreenshotMouseClicked
+
+    private void buttonRunMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buttonRunMouseClicked
+        toggleVisualizer(true);
+    }//GEN-LAST:event_buttonRunMouseClicked
+
+    private void speedSliderMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_speedSliderMouseDragged
+        visualizer.setSpeed((int)(speedSlider.getValue()/(100.0/15.0)));
+
+    }//GEN-LAST:event_speedSliderMouseDragged
+
+    private void scrollPane0MouseWheelMoved(java.awt.event.MouseWheelEvent evt) {//GEN-FIRST:event_scrollPane0MouseWheelMoved
+        streamPanel1.setZoom(evt.getX(),evt.getY(),(-1)*evt.getWheelRotation(),scrollPane1);
+    }//GEN-LAST:event_scrollPane0MouseWheelMoved
+
+    private void buttonZoomInXActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonZoomInXActionPerformed
+        subspaceGraphCanvas.scaleXResolution(false);
+    }//GEN-LAST:event_buttonZoomInXActionPerformed
+
+    private void buttonZoomOutYActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonZoomOutYActionPerformed
+        subspaceGraphCanvas.setSize(new Dimension(subspaceGraphCanvas.getWidth(), (int)(subspaceGraphCanvas.getHeight()*0.8)));
+        subspaceGraphCanvas.setPreferredSize(new Dimension(subspaceGraphCanvas.getWidth(), (int)(subspaceGraphCanvas.getHeight()*0.8)));
+    }//GEN-LAST:event_buttonZoomOutYActionPerformed
+
+    private void buttonZoomOutXActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonZoomOutXActionPerformed
+        subspaceGraphCanvas.scaleXResolution(true);
+    }//GEN-LAST:event_buttonZoomOutXActionPerformed
+
+    private void buttonZoomInYActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonZoomInYActionPerformed
+        subspaceGraphCanvas.setSize(new Dimension(subspaceGraphCanvas.getWidth(), (int)(subspaceGraphCanvas.getHeight()*1.2)));
+        subspaceGraphCanvas.setPreferredSize(new Dimension(subspaceGraphCanvas.getWidth(), (int)(subspaceGraphCanvas.getHeight()*1.2)));
+    }//GEN-LAST:event_buttonZoomInYActionPerformed
+
+    private void checkboxDrawPointsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkboxDrawPointsActionPerformed
+        visualizer.setPointLayerVisibility(checkboxDrawPoints.isSelected());
+    }//GEN-LAST:event_checkboxDrawPointsActionPerformed
+
+    private void checkboxDrawMicroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkboxDrawMicroActionPerformed
+        //visualizer.redrawClusterings();
+        visualizer.setMicroLayerVisibility(checkboxDrawMicro.isSelected());
+    }//GEN-LAST:event_checkboxDrawMicroActionPerformed
+
+    private void checkboxDrawGTActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkboxDrawGTActionPerformed
+        //visualizer.redrawClusterings();
+        visualizer.setGroundTruthVisibility(checkboxDrawGT.isSelected());
+    }//GEN-LAST:event_checkboxDrawGTActionPerformed
+
+    private void checkboxDrawClusteringActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_checkboxDrawClusteringActionPerformed
+        //visualizer.redrawClusterings();
+        visualizer.setMacroVisibility(checkboxDrawClustering.isSelected());
+    }//GEN-LAST:event_checkboxDrawClusteringActionPerformed
+
+    private void comboXActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboXActionPerformed
+        JComboBox cb = (JComboBox)evt.getSource();
+        int dim = cb.getSelectedIndex();
+        streamPanel1.setActiveXDim(dim);
+        streamPanel2.setActiveXDim(dim);
+        if(visualizer!=null)
+            visualizer.redraw();
+    }//GEN-LAST:event_comboXActionPerformed
+
+    private void comboYActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboYActionPerformed
+        JComboBox cb = (JComboBox)evt.getSource();
+        int dim = cb.getSelectedIndex();
+        streamPanel1.setActiveYDim(dim);
+        streamPanel2.setActiveYDim(dim);
+        if(visualizer!=null)
+            visualizer.redraw();
+    }//GEN-LAST:event_comboYActionPerformed
+
+    private void buttonStopActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonStopActionPerformed
+        stopVisualizer();
+        subspaceClusteringSetupTab.stopRun();
+    }//GEN-LAST:event_buttonStopActionPerformed
+
+    private void buttonRunActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_buttonRunActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_buttonRunActionPerformed
+    
+    
+    /** For object Ranking **/
+    private int objectRankingDialogWidth = 500;
+    private int objectRankingDialogHeight = 600;
+    
+    private void buttonObjectRanking0ActionPerformed(java.awt.event.ActionEvent evt) {
+    	JDialog jDialog = new JDialog();
+    	
+    	SubspaceObjectRankingPanel objectRankingPanel = new SubspaceObjectRankingPanel(visualizer, 0);
+    	jDialog.add(objectRankingPanel);
+    	
+    	jDialog.setTitle("Object Ranking 1");
+    	jDialog.setSize(objectRankingDialogWidth, objectRankingDialogHeight);
+    	jDialog.setVisible(true);
+    }
+    
+    private void buttonObjectRanking1ActionPerformed(java.awt.event.ActionEvent evt) {
+    	JDialog jDialog = new JDialog();
+    	
+    	SubspaceObjectRankingPanel objectRankingPanel = new SubspaceObjectRankingPanel(visualizer, 1);
+    	jDialog.add(objectRankingPanel);
+    	
+    	jDialog.setTitle("Object Ranking 2");
+    	jDialog.setSize(objectRankingDialogWidth, objectRankingDialogHeight);
+    	jDialog.setVisible(true);
+    }
+
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton buttonRun;
+    private javax.swing.JButton buttonScreenshot;
+    private javax.swing.JButton buttonStop;
+    private javax.swing.JButton buttonZoomInX;
+    private javax.swing.JButton buttonZoomInY;
+    private javax.swing.JButton buttonZoomOutX;
+    private javax.swing.JButton buttonZoomOutY;
+    private javax.swing.JCheckBox checkboxDrawClustering;
+    private javax.swing.JCheckBox checkboxDrawGT;
+    private javax.swing.JCheckBox checkboxDrawMicro;
+    private javax.swing.JCheckBox checkboxDrawPoints;
+    private moa.gui.subspaceclusteringtab.SubspaceClusteringVisualEvalPanel subspaceClusteringVisualEvalPanel1;
+    private javax.swing.JComboBox comboX;
+    private javax.swing.JComboBox comboY;
+    private moa.gui.subspacevisualization.SubspaceGraphCanvas subspaceGraphCanvas;
+    private javax.swing.JPanel graphPanel;
+    private javax.swing.JPanel graphPanelControlBottom;
+    private javax.swing.JPanel graphPanelControlTop;
+    private javax.swing.JScrollPane graphScrollPanel;
+    private javax.swing.JSplitPane jSplitPane1;
+    private javax.swing.JLabel labelEvents;
+    private javax.swing.JLabel labelNumPause;
+    private javax.swing.JLabel labelX;
+    private javax.swing.JLabel labelY;
+    private javax.swing.JLabel label_processed_points;
+    private javax.swing.JLabel label_processed_points_value;
+    private javax.swing.JTextField numPauseAfterPoints;
+    private javax.swing.JPanel panelControl;
+    private javax.swing.JPanel panelEvalOutput;
+    private javax.swing.JPanel panelVisualWrapper;
+    private javax.swing.JScrollPane scrollPane1;
+    private javax.swing.JScrollPane scrollPane2;
+    private javax.swing.JSlider speedSlider;
+    private javax.swing.JSplitPane splitVisual;
+    private moa.gui.subspacevisualization.SubspaceStreamPanel streamPanel1;
+    private moa.gui.subspacevisualization.SubspaceStreamPanel streamPanel2;
+    private javax.swing.JPanel topWrapper;
+    // End of variables declaration//GEN-END:variables
+    
+    // -- New ones
+    private javax.swing.JPanel leftPanelWithObjectRanking;
+    private javax.swing.JPanel rightPanelWithObjectRanking;
+    private javax.swing.JButton buttonObjectRanking1;
+    private javax.swing.JButton buttonObjectRanking2;
+
+    public void actionPerformed(ActionEvent e) {
+        if(e.getSource() instanceof JButton){
+            if(e.getActionCommand().equals("csv export")){
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setAcceptAllFileFilterUsed(true);
+                fileChooser.addChoosableFileFilter(new FileExtensionFilter("csv"));
+                if(exportFile!=null)
+                    fileChooser.setSelectedFile(new File(exportFile));
+                if (fileChooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
+                    exportFile = fileChooser.getSelectedFile().getPath();
+                    visualizer.exportCSV(exportFile);
+                }
+            }
+            if(e.getActionCommand().equals("weka export")){
+                visualizer.weka();
+            }
+        }
+    }
+}
