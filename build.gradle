@@ -34,6 +34,7 @@ mainClassName = 'moa.gui.SubspaceGui'
 //builds a minified jar that only contains the classes 
 //needed for the r interface and especially no images etc.
 task rjar(type: proguard.gradle.ProGuardTask,dependsOn: shadowJar) {
+  inputs.files(files('build/libs/subspacemoa-all.jar'))
   configuration 'proguardconfig.pro'
 }
 
