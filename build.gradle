@@ -31,10 +31,11 @@ dependencies {
 
 mainClassName = 'moa.gui.SubspaceGui'
 
-task minify(type: proguard.gradle.ProGuardTask,dependsOn: shadowJar) {
-  injars 'build/libs/subspacemoa-all.jar'
-  outjars 'build/libs/subspacemoa-all-minified.jar'
+//builds a minified jar that only contains the classes 
+//needed for the r interface and especially no images etc.
+task rjar(type: proguard.gradle.ProGuardTask,dependsOn: shadowJar) {
   configuration 'proguardconfig.pro'
 }
+
 //Makes a fatJar.
-task fatJar(dependsOn:shadowJar) {}
+task fatJar(dependsOn:shadowJar) { }

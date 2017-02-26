@@ -1,3 +1,6 @@
+-injars build/libs/subspacemoa-all.jar(!**.png,!**.jpg,!**.gif,!**.txt,!**.xml,!**.so,!**.dll,!**.jnilib)
+-outjars build/libs/subspacemoa-rjar.jar
+
 -libraryjars /usr/lib/jvm/default-java/jre/lib/rt.jar
 
 -dontoptimize
