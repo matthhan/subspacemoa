@@ -61,7 +61,7 @@ public class SubspaceClusteringAlgoPanel extends javax.swing.JPanel implements A
         	"Subspace clustering algorithm for macro-clustering.", MacroSubspaceClusterer.class, "CLIQUE");
     
     private ClassOption oneStopAlgorithmOption1 = new ClassOption("oneStopAlgorithm1", 'o',
-            "Premade one-stop algorithm which can care both micro- and macro- clustering.", SubspaceClusterer.class, "predeconStream.PreDeConStream");
+            "Premade one-stop algorithm which can care both micro- and macro- clustering.", SubspaceClusterer.class, "predeconstream.PreDeConStream");
     
     private ClassOptionWithNames microAlgorithmOption2 = new ClassOptionWithNames("microAlgorithm2", 'c',
         	"Stream clustering algorithm for micro-clustering.", Clusterer.class, "clustream.Clustream",

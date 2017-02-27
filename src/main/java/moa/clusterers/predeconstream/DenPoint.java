@@ -8,7 +8,7 @@
  * Data Management and Data Exploration Group, RWTH Aachen University
  */
 
-package moa.clusterers.predeconStream;
+package moa.clusterers.predeconstream;
 
 import weka.core.DenseInstance;
 import weka.core.Instance;

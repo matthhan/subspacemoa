@@ -9,7 +9,7 @@
  * Data Management and Data Exploration Group, RWTH Aachen University
  */
 
-package moa.clusterers.predeconStream;
+package moa.clusterers.predeconstream;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,7 +22,6 @@ import moa.cluster.Cluster;
 import moa.cluster.Clustering;
 import moa.cluster.SubspaceClustering;
 import moa.clusterers.AbstractSubspaceClusterer;
-import moa.clusterers.predeconStream.weightedNonConvexCluster;
 import moa.clusterers.macro.NonConvexCluster;
 import moa.core.Measurement;
 import moa.options.FloatOption;

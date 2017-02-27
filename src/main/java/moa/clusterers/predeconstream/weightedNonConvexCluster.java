@@ -1,4 +1,4 @@
-package moa.clusterers.predeconStream;
+package moa.clusterers.predeconstream;
 
 /**
  * [weightedNonConvexCluster.java] for Subspace MOA

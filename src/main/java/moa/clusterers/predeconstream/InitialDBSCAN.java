@@ -7,7 +7,7 @@
  * 		   based on the implementation by Pascal Spaus
  * Data Management and Data Exploration Group, RWTH Aachen University
  */
-package moa.clusterers.predeconStream;
+package moa.clusterers.predeconstream;
 
 import java.util.ArrayList;
 

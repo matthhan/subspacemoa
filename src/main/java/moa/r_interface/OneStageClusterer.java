@@ -4,11 +4,8 @@ import moa.cluster.Clustering;
 import moa.cluster.SubspaceClustering;
 import moa.clusterers.SubspaceClusterer;
 import moa.clusterers.hddstream.HDDStream;
-import moa.clusterers.predeconStream.PreDeConStream;
+import moa.clusterers.predeconstream.PreDeConStream;
 import moa.core.SubspaceInstance;
-import moa.evaluation.SubspaceMeasureCollection;
-
-import java.util.Set;
 
 
 public class OneStageClusterer extends RCompatibleDataStreamClusterer {
