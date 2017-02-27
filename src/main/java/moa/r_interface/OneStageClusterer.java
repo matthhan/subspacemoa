@@ -6,6 +6,9 @@ import moa.clusterers.SubspaceClusterer;
 import moa.clusterers.hddstream.HDDStream;
 import moa.clusterers.predeconStream.PreDeConStream;
 import moa.core.SubspaceInstance;
+import moa.evaluation.SubspaceMeasureCollection;
+
+import java.util.Set;
 
 
 public class OneStageClusterer extends RCompatibleDataStreamClusterer {
@@ -71,6 +74,13 @@ public class OneStageClusterer extends RCompatibleDataStreamClusterer {
     public void trainOn(double[] point) {
         this.clusterer.trainOnInstance(new SubspaceInstance(1,point));
     }
+
+    @Override
+    public SubspaceClustering getClusteringForEvaluation() {
+        return this.clusterer.getClusteringResult();
+    }
+
+
     public static RCompatibleDataStreamClusterer hddstream(double epsilonN,
                                            double beta,
                                            int mu,

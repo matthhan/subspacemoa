@@ -9,7 +9,7 @@ import moa.core.SubspaceInstance;
 public class ThreeStageClusterer extends RCompatibleDataStreamClusterer {
     private MacroSubspaceClusterer macro;
     private AbstractClusterer micro;
-    private SubspaceClustering currentMacroClustering = null;
+    private SubspaceClustering macroClustering = null;
     private boolean macroClusteringDirty = true;
 
     private ThreeStageClusterer(MacroSubspaceClusterer macro, AbstractClusterer micro) {
@@ -44,16 +44,14 @@ public class ThreeStageClusterer extends RCompatibleDataStreamClusterer {
 
     @Override
     public double[][] getMacroclusteringCenters() {
-        if(macroClusteringDirty) {
-            this.computeMacroclustering();
-        }
-        if(this.currentMacroClustering == null || this.currentMacroClustering.size() == 0) {
+        SubspaceClustering macroclustering = this.getMacroClustering();
+        if(macroclustering == null || macroclustering.size() == 0) {
             return new double[][] {{0}};
         }
-        double[][] res = new double[this.currentMacroClustering.size()][this.currentMacroClustering.dimension()];
-        for(int i = 0; i < this.currentMacroClustering.size(); i++) {
-            double[] center = this.currentMacroClustering.get(i).getCenter();
-            System.arraycopy(center, 0, res[i], 0, this.currentMacroClustering.dimension());
+        double[][] res = new double[macroclustering.size()][macroclustering.dimension()];
+        for(int i = 0; i < macroclustering.size(); i++) {
+            double[] center = macroclustering.get(i).getCenter();
+            System.arraycopy(center, 0, res[i], 0, macroclustering.dimension());
         }
         return res;
     }
@@ -62,15 +60,13 @@ public class ThreeStageClusterer extends RCompatibleDataStreamClusterer {
 
     @Override
     public double[] getMacroclusteringWeights() {
-        if(macroClusteringDirty) {
-            this.computeMacroclustering();
-        }
-        if(this.currentMacroClustering == null || this.currentMacroClustering.size() == 0) {
+        SubspaceClustering macroclustering = this.getMacroClustering();
+        if(macroclustering == null || macroclustering.size() == 0) {
             return new double[] {0};
         }
-        double[] res = new double[this.currentMacroClustering.size()];
-        for(int i = 0; i < this.currentMacroClustering.size();i++) {
-            res[i] = this.currentMacroClustering.get(i).getWeight();
+        double[] res = new double[macroclustering.size()];
+        for(int i = 0; i < macroclustering.size(); i++) {
+            res[i] = macroclustering.get(i).getWeight();
         }
         return res;
     }
@@ -80,8 +76,20 @@ public class ThreeStageClusterer extends RCompatibleDataStreamClusterer {
         this.micro.trainOnInstanceImpl(new SubspaceInstance(1,point));
         this.macroClusteringDirty = true;
     }
+
+    @Override
+    public SubspaceClustering getClusteringForEvaluation() {
+       return this.getMacroClustering();
+    }
+
+    private SubspaceClustering getMacroClustering() {
+        if(this.macroClusteringDirty) {
+            this.computeMacroclustering();
+        }
+        return this.macroClustering;
+    }
     private void computeMacroclustering() {
-        this.currentMacroClustering = this.macro.getClusteringResult(this.micro.getMicroClusteringResult());
+        this.macroClustering = this.macro.getClusteringResult(this.micro.getMicroClusteringResult());
         this.macroClusteringDirty = false;
     }
     public static RCompatibleDataStreamClusterer threeStage(AbstractClusterer micro,MacroSubspaceClusterer macro) {
