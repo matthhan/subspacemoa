@@ -10,7 +10,7 @@ public class RCompatibleEvaluationResult {
         for (int i = 0; i < measureValues.size(); i++) {
             this.values[i] = measureValues.get(i);
         }
-        this.names = (String[]) measureNames.toArray();
+        this.names = measureNames.toArray(new String[0]);
     }
     double[] getValues() { return this.values; }
     String[] getNames() { return this.names; }
