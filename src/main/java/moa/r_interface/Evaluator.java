@@ -39,7 +39,7 @@ public class Evaluator {
         }
         return measureObjs;
     }
-    public RCompatibleEvaluationResult evaluate(RCompatibleDataStreamClusterer clusterer,RCompatibleDataStream stream,int n,String[] measureStrings) {
+    public RCompatibleEvaluationResult evaluate(RCompatibleDataStreamClusterer clusterer,RCompatibleDataStream stream,int n,String[] measureStrings,boolean alsoTrainOn) {
 
         Set<SubspaceMeasureCollection> measures = parseMeasures(measureStrings);
         List<SubspaceDataPoint> pointBuffer = new ArrayList<>(n);
@@ -57,7 +57,7 @@ public class Evaluator {
             } else {
                 trainInst.deleteAttributeAt(point.classIndex());
             }
-            clusterer.trainOnInstance(trainInst);
+            if(alsoTrainOn) clusterer.trainOnInstance(trainInst);
         }
 
         SubspaceClustering result = clusterer.getClusteringForEvaluation();
