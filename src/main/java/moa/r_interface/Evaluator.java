@@ -75,7 +75,15 @@ public class Evaluator {
                 System.out.println("error processing measures: " + measure.toString());
             }
         }
+        res.setPoints(asDoubleArr(pointBuffer));
         return res;
 
+    }
+    private static double[][] asDoubleArr(List<SubspaceDataPoint> lis) {
+        double[][] res = new double[lis.size()][lis.get(0).toDoubleArray().length];
+        for (int i = 0; i < res.length; i++) {
+            res[i] = lis.get(i).toDoubleArray();
+        }
+        return res;
     }
 }
