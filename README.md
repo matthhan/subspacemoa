@@ -13,3 +13,7 @@ To run the minify task, one should also have proguard installed and the Java Hom
 ##R interface
 
 The source code for the R interface to this package can be found [here](https://github.com/matthhan/rsubspacemoa)
+
+##Paper
+
+Marwan Hassani, Yunsu Kim, Thomas Seidl (2013); Subspace MOA: Subspace Stream Clustering Evaluation Using the MOA Framework; The 18th International Conference on Database Systems for Advanced Applications (Best Demo Award Runner-Up)
