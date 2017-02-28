@@ -1,5 +1,6 @@
 package moa.r_interface;
 
+import moa.cluster.Clustering;
 import moa.cluster.SubspaceClustering;
 import moa.core.SubspaceInstance;
 import moa.evaluation.*;
@@ -8,57 +9,6 @@ import moa.gui.subspacevisualization.SubspaceDataPoint;
 import java.util.*;
 
 public class Evaluator {
-    public RCompatibleEvaluationResult evaluate(RCompatibleDataStreamClusterer clusterer,double[][] points,double[] classes,String[] measures) {
-        Set<SubspaceMeasureCollection> measureObjects = parseMeasures(measures);
-        SubspaceClustering foundClustering = clusterer.getClusteringForEvaluation();
-        SubspaceClustering groundTruthClustering = buildGroundTruthClustering(points,classes);
-        List<SubspaceDataPoint> pointsAsList = buildDatapointlist(points);
-
-        List<String> measureNames = new ArrayList<>();
-        List<Double> measureValues = new ArrayList<>();
-        for(SubspaceMeasureCollection measure:measureObjects) {
-            try {
-                measure.subEvaluateClusteringPerformance(foundClustering,groundTruthClustering,pointsAsList);
-                for(int i = 0; i < measure.getNumMeasures();i++) {
-                    measureNames.add(measure.getName(i));
-                    measureValues.add(measure.getLastValue(i));
-                }
-            } catch (Exception e) {
-                System.out.println("error processing measure " + measure);
-            }
-        }
-        return new RCompatibleEvaluationResult(measureNames,measureValues);
-    }
-
-    //TODO Make sure that it is alright to just always pass 1 as the timestamp
-    //TODO Make sure that we do not have to pass the class
-    private static List<SubspaceDataPoint> buildDatapointlist(double[][] points) {
-        List<SubspaceDataPoint> res  = new ArrayList<>(points.length);
-        for(double[] point:points) {
-            SubspaceInstance asInst = new SubspaceInstance(1,point);
-            res.add(new SubspaceDataPoint(asInst,1));
-        }
-        return res;
-    }
-
-
-    private static SubspaceClustering buildGroundTruthClustering(double[][] points, double[] classes) {
-
-        SubspaceClustering res = new SubspaceClustering();
-        Set<Double> distinctClasses = new HashSet<>();
-
-        for(double klass:classes) { distinctClasses.add(klass); }
-        for(double klass:distinctClasses) {
-            ListCluster clus = new ListCluster();
-            for (int i = 0; i < points.length; i++) {
-                if(classes[i] == klass) {
-                    clus.add(points[i]);
-                }
-            }
-            res.add(clus);
-        }
-        return res;
-    }
 
     private Set<SubspaceMeasureCollection> parseMeasures(String[] measures) {
         Set<SubspaceMeasureCollection> measureObjs = new LinkedHashSet<>();
@@ -88,5 +38,44 @@ public class Evaluator {
             }
         }
         return measureObjs;
+    }
+    public RCompatibleEvaluationResult evaluate(RCompatibleDataStreamClusterer clusterer,RCompatibleDataStream stream,int n,String[] measureStrings) {
+
+        Set<SubspaceMeasureCollection> measures = parseMeasures(measureStrings);
+        List<SubspaceDataPoint> pointBuffer = new ArrayList<>(n);
+;
+
+        for (int timestamp = 0;timestamp < n;timestamp++) {
+            SubspaceInstance next = stream.nextInstance();
+            SubspaceDataPoint point = new SubspaceDataPoint(next, timestamp);
+            pointBuffer.add(point);
+
+            // Train clusterers
+            SubspaceInstance trainInst = new SubspaceInstance(point);
+            if (clusterer.keepClassLabel()) {
+                trainInst.setDataset(point.dataset());
+            } else {
+                trainInst.deleteAttributeAt(point.classIndex());
+            }
+            clusterer.trainOnInstance(trainInst);
+        }
+
+        SubspaceClustering result = clusterer.getClusteringForEvaluation();
+        SubspaceClustering gtClustering = new SubspaceClustering(pointBuffer);
+
+        RCompatibleEvaluationResult res = new RCompatibleEvaluationResult();
+        for (SubspaceMeasureCollection measure:measures) {
+            try {
+                measure.subEvaluateClusteringPerformance(result, gtClustering, pointBuffer);
+                measure.averageSubEvaluations();
+                for (int i = 0; i < measure.getNumMeasures(); i++) {
+                    res.addMeasureValue(measure.getName(i),measure.getLastValue(i));
+                }
+            } catch (Exception e) {
+                System.out.println("error processing measures: " + measure.toString());
+            }
+        }
+        return res;
+
     }
 }

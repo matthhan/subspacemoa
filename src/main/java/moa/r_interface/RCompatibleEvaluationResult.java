@@ -1,17 +1,30 @@
 package moa.r_interface;
 
-import java.util.List;
+import java.util.*;
 
 public class RCompatibleEvaluationResult {
-    private double[] values;
-    private String[] names;
-    RCompatibleEvaluationResult(List<String> measureNames, List<Double> measureValues) {
-        this.values = new double[measureValues.size()];
-        for (int i = 0; i < measureValues.size(); i++) {
-            this.values[i] = measureValues.get(i);
-        }
-        this.names = measureNames.toArray(new String[0]);
+    private Map<String,Double> valueForMeasure;
+    private List<String> insertionOrder;
+    RCompatibleEvaluationResult() {
+        this.valueForMeasure = new LinkedHashMap<>();
+        this.insertionOrder = new LinkedList<>();
     }
-    double[] getValues() { return this.values; }
-    String[] getNames() { return this.names; }
+    void addMeasureValue(String name,double value) {
+        this.valueForMeasure.put(name,value);
+        this.insertionOrder.add(name);
+    }
+    double[] getValues() {
+        double[] res = new double[this.valueForMeasure.size()];
+        for(int i = 0;i<this.valueForMeasure.size();i++) {
+            res[i] = this.valueForMeasure.get(this.insertionOrder.get(i));
+        }
+        return res;
+    }
+    String[] getNames() {
+        String[] res = new String[this.insertionOrder.size()];
+        for (int i = 0; i < res.length; i++) {
+            res[i] = this.insertionOrder.get(i);
+        }
+        return res;
+    }
 }

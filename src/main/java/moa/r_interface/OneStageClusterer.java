@@ -77,6 +77,16 @@ public class OneStageClusterer extends RCompatibleDataStreamClusterer {
         return this.clusterer.getClusteringResult();
     }
 
+    @Override
+    void trainOnInstance(SubspaceInstance inst) {
+        this.clusterer.trainOnInstance(inst);
+    }
+
+    @Override
+    boolean keepClassLabel() {
+        return this.clusterer.keepClassLabel();
+    }
+
 
     public static RCompatibleDataStreamClusterer hddstream(double epsilonN,
                                            double beta,

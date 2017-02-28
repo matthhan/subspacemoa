@@ -1,4 +1,5 @@
 package moa.r_interface;
+import moa.core.SubspaceInstance;
 import moa.streams.clustering.RandomRBFSubspaceGeneratorEvents;
 import moa.streams.clustering.SubspaceARFFStream;
 import moa.streams.clustering.SubspaceClusteringStream;
@@ -18,6 +19,9 @@ public class RCompatibleDataStream {
     }
     public int getNumAtts() {
         return this.stream.numAttsOption.getValue();
+    }
+    SubspaceInstance nextInstance() {
+        return this.stream.nextInstance();
     }
     public static RCompatibleDataStream random(
             int modelRandomSeed,

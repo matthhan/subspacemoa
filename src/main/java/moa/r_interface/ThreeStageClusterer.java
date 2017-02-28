@@ -92,6 +92,16 @@ public class ThreeStageClusterer extends RCompatibleDataStreamClusterer {
         this.macroClustering = this.macro.getClusteringResult(this.micro.getMicroClusteringResult());
         this.macroClusteringDirty = false;
     }
+
+    @Override
+    void trainOnInstance(SubspaceInstance inst ) {
+        this.micro.trainOnInstance(inst);
+    }
+
+    @Override
+    boolean keepClassLabel() {
+        return this.micro.keepClassLabel();
+    }
     public static RCompatibleDataStreamClusterer threeStage(AbstractClusterer micro,MacroSubspaceClusterer macro) {
         return new ThreeStageClusterer(macro,micro);
     }
