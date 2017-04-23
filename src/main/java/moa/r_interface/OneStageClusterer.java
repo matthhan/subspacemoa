@@ -71,16 +71,15 @@ public class OneStageClusterer extends RCompatibleDataStreamClusterer {
 
     @Override
     public boolean isClusterInDimension(int i,int dim) {
-        return ((SubspaceSphereCluster) this.clusterer.getClusteringResult().get(i)).isRelevant(dim);
+        return true;
     }
     @Override
     public double[] getBordersOfClusterInDimension(int i,int dim) {
-        SubspaceSphereCluster cluster = (SubspaceSphereCluster)this.clusterer.getClusteringResult().get(i);
-        return new double[] { cluster.getLeftBoundary(dim), cluster.getRightBoundary(dim) };
+        return new double[]{Double.MIN_VALUE,Double.MAX_VALUE};
     }
     @Override
     public double getRadiusOfCluster(int i) {
-        return ((SubspaceSphereCluster) this.clusterer.getClusteringResult().get(i)).getRadius();
+        return 0;
     }
 
     @Override
