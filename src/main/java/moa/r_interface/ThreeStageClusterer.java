@@ -2,9 +2,11 @@ package moa.r_interface;
 
 import moa.cluster.Clustering;
 import moa.cluster.SubspaceClustering;
+import moa.cluster.SubspaceSphereCluster;
 import moa.clusterers.AbstractClusterer;
 import moa.clusterers.macrosubspace.MacroSubspaceClusterer;
 import moa.core.SubspaceInstance;
+import weka.datagenerators.clusterers.SubspaceCluster;
 
 public class ThreeStageClusterer extends RCompatibleDataStreamClusterer {
     private MacroSubspaceClusterer macro;
@@ -75,6 +77,23 @@ public class ThreeStageClusterer extends RCompatibleDataStreamClusterer {
     public void trainOn(double[] point) {
         this.micro.trainOnInstanceImpl(new SubspaceInstance(1,point));
         this.macroClusteringDirty = true;
+    }
+
+    @Override
+    public boolean isClusterInDimension(int i, int dim) {
+        return ((SubspaceSphereCluster)this.getMacroClustering().get(i)).isRelevant(dim);
+    }
+
+    @Override
+    public double[] getBordersOfClusterInDimension(int i, int dim) {
+        SubspaceSphereCluster res =  ((SubspaceSphereCluster)this.getMacroClustering().get(i));
+        return new double[]{ res.getLeftBoundary(dim), res.getRightBoundary(dim)};
+    }
+
+    @Override
+    public double getRadiusOfCluster(int i) {
+        SubspaceSphereCluster res =  ((SubspaceSphereCluster)this.getMacroClustering().get(i));
+        return res.getRadius();
     }
 
     @Override

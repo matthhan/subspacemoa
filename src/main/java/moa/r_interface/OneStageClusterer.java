@@ -1,7 +1,9 @@
 package moa.r_interface;
 
+import moa.cluster.Cluster;
 import moa.cluster.Clustering;
 import moa.cluster.SubspaceClustering;
+import moa.cluster.SubspaceSphereCluster;
 import moa.clusterers.SubspaceClusterer;
 import moa.clusterers.hddstream.HDDStream;
 import moa.clusterers.predeconstream.PreDeConStream;
@@ -65,6 +67,20 @@ public class OneStageClusterer extends RCompatibleDataStreamClusterer {
             res[i] = clustering.get(i).getWeight();
         }
         return res;
+    }
+
+    @Override
+    public boolean isClusterInDimension(int i,int dim) {
+        return ((SubspaceSphereCluster) this.clusterer.getClusteringResult().get(i)).isRelevant(dim);
+    }
+    @Override
+    public double[] getBordersOfClusterInDimension(int i,int dim) {
+        SubspaceSphereCluster cluster = (SubspaceSphereCluster)this.clusterer.getClusteringResult().get(i);
+        return new double[] { cluster.getLeftBoundary(dim), cluster.getRightBoundary(dim) };
+    }
+    @Override
+    public double getRadiusOfCluster(int i) {
+        return ((SubspaceSphereCluster) this.clusterer.getClusteringResult().get(i)).getRadius();
     }
 
     @Override
